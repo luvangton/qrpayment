@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=375, initial-scale=1.0" />
+<title>QR Thanh toán – Prototype</title>
+
+<style>
+/* ===== RESET ===== */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 0;
+  background: #b0005a;
+  display: flex;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ===== APP FRAME ===== */
+.app {
+  width: 375px;
+  height: 812px;
+  background: linear-gradient(180deg,#b0005a,#d81b7d);
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+/* ===== HEADER (OPTIMIZED) ===== */
+.header {
+  height: 46px;
+  padding: 10px 16px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* icon chung */
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ===== QR refresh ===== */
+
+.refresh {
+  color: #ff4fa3;
+  font-weight: 600;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.refresh.hidden {
+  display: none;
+}
+
+/* ===== QR refresh visual feedback ===== */
+.qr-box.refreshing {
+  animation: qrFlash .4s ease;
+}
+
+@keyframes qrFlash {
+  0%   { box-shadow: 0 0 0 1px #eee; }
+  50%  { box-shadow: 0 0 0 3px #ff4fa3; }
+  100% { box-shadow: 0 0 0 1px #eee; }
+}
+
+/* ===== CARD ===== */
+.card {
+  margin: 12px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 12px;
+}
+.xu-banner {
+  background: #eef6ff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 12px;
+  transition: background .25s ease, color .25s ease;
+}
+.barcode {
+  height: 36px;
+  background: repeating-linear-gradient(
+    90deg,#000 0,#000 2px,#fff 2px,#fff 4px
+  );
+  margin-bottom: 16px;
+}
+.qr-wrapper { display: flex; justify-content: center; }
+.qr-box {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  padding: 8px;
+  border-color: #f5f6f7;
+  border-style: solid;
+}
+
+.qr-box img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.qr-color-layer {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: background .25s ease;
+}
+
+.countdown {
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  margin: 8px 0 12px;
+}
+/* ===== VOUCHER TOGGLE ===== */
+.voucher {
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+
+/* ON */
+.voucher.on {
+  background: #eaf4ff;
+}
+
+.voucher.on .voucher-text,
+.voucher.on .voucher-arrow {
+  color: #007aff;
+  font-weight: 600;
+}
+
+/* OFF */
+.voucher.off {
+  background: #f1f1f1;
+}
+
+.voucher.off .voucher-text,
+.voucher.off .voucher-arrow {
+  color: #999;
+  font-weight: 500;
+}
+
+
+/* Text state cho xu-toggle */
+.xu-toggle {
+  display: flex;
+  align-items: center;          /* QUAN TRỌNG */
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.xu-toggle.off {
+  color: #999;
+}
+
+.xu-toggle.on {
+  color: #111;
+}
+
+.xu-toggle.on b {
+  font-weight: 700;
+}
+
+.xu-toggle.off b {
+  font-weight: 600;
+}
+.switch {
+  width: 42px;
+  height: 24px;
+  background: #ddd;
+  border-radius: 12px;
+  position: relative;
+  transition: background .2s ease;
+  cursor: pointer;
+}
+
+.switch::after {
+  content:"";
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left .2s ease;
+}
+
+/* ON state */
+.switch.on {
+  background: #ff4fa3;
+}
+
+.switch.on::after {
+  left: 20px;
+}
+
+/* ===== ACCOUNT PREVIEW ===== */
+.account-section {
+  margin: 12px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 12px;
+}
+.account-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.account-header span:last-child {
+  color: #ff4fa3;
+  cursor: pointer;
+}
+.account-list {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+}
+.account-card {
+  min-width: 160px;
+  flex-shrink: 0;
+  border: 2px solid #eee;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.card-info {
+  font-weight: 400;
+}
+.account-card.active { 
+  border-color: #ff4fa3; 
+  font-weight: 700;
+}
+
+/* ===== OVERLAY ===== */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: .25s;
+  z-index: 90;
+}
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== BOTTOM SHEET ===== */
+.sheet {
+  position: absolute;
+  left: 0;
+  bottom: -100%;
+  width: 100%;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  transition: bottom .3s ease;
+  z-index: 100;
+}
+.sheet.show { bottom: 0; }
+.sheet-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+.sheet-body { max-height: 70vh; overflow-y: auto; }
+.account-row {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.account-row.active {
+  border: 2px solid #ff4fa3;
+  border-radius: 14px;
+  margin: 8px;
+}
+.account-row.disabled { opacity: .4; }
+.account-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.account-info { flex: 1; }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 78px;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #eee;
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  color: #999;
+}
+.nav-item.active { color: #ff4fa3; font-weight: 600; }
+.nav-icon { font-size: 28px; margin-bottom: 6px; }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="icon-btn">←</div>
+    <span class="header-title">QR của tôi</span>
+  </div>
+
+  <div class="header-right">
+    <div class="icon-btn">▦</div>
+    <div class="icon-btn">🛒</div>
+    <div class="icon-btn">✕</div>
+  </div>
+</div>
+
+
+  <!-- MAIN CARD -->
+  <div class="card">
+    <div class="xu-banner"id="xuBanner">🌼 Thanh toán, <b style="color:#007AFF;font-style: italic;font-family: inherit;font-size: 16px;">tích xu</b> cho tất cả giao dịch</div>
+    <div class="barcode"></div>
+    <div class="qr-wrapper">
+     <div class="qr-box">
+  <img id="qrImg"
+    src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MoMoDemo" />
+  <div class="qr-color-layer" id="qrColor"></div>
+</div>
+    </div>
+    <div class="countdown">
+      Mã QR thanh toán sẽ làm mới sau <b id="cd">60s</b>.
+      <span id="manualRefresh" class="refresh hidden">Cập nhật</span>
+    </div>
+    <div class="voucher on" id="voucherToggle">
+  <span class="voucher-text">Tự động áp dụng ưu đãi ✅</span>
+</div>
+<div class="xu-toggle on" id="xuToggle">
+  <div>
+    <b>Tự động đổi <span style="color:#FA8C16;font-style: italic;font-family: inherit;font-size: 16px;" >Xu</span> phù hợp</b><br>
+    <small>Giảm tới 50% đơn hàng</small>
+  </div>
+  <div class="switch on" id="xuSwitch"></div>
+</div>
+  </div>
+
+  <!-- ACCOUNT PREVIEW -->
+  <div class="account-section">
+    <div class="account-header">
+      <span>Tài khoản/Thẻ</span>
+      <span onclick="openSheet()">Xem tất cả</span>
+    </div>
+    <div class="account-list">
+      <div class="account-card active">Vietcombank<br><small  class="card-info">10k – 2tr/GD</small></div>
+      <div class="account-card">Ví MoMo<br><small class="card-info">1.304.072đ</small></div>
+      <div class="account-card">🎁 Túi Thần Tài<br><small class="card-info">300.083đ</small></div>
+      <div class="account-card">ACB<br><small class="card-info">10k – 10tr/GD</small></div>
+    </div>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+  <!-- BOTTOM SHEET -->
+  <div class="sheet" id="sheet">
+    <div class="sheet-header">
+      <span></span>Chọn tài khoản<span onclick="closeSheet()">✕</span>
+    </div>
+    <div class="sheet-body">
+      <div class="account-row active">
+        <div class="account-icon">MoMo</div>
+        <div class="account-info"><b>Ví MoMo</b><br><small>Miễn phí thanh toán</small></div>
+        <b>1.304.072đ</b>
+      </div>
+      <div class="account-row">
+        <div class="account-icon">🎁</div>
+        <div class="account-info"><b>Túi Thần Tài</b></div>
+        <b>300.083đ</b>
+      </div>
+      <div class="account-row">
+        <div class="account-icon">ACB</div>
+        <div class="account-info"><b>ACB</b></div>
+      </div>
+      <div class="account-row">
+        <div class="account-icon">VCB</div>
+        <div class="account-info"><b>Vietcombank</b></div>
+      </div>
+      <div class="account-row"><div class="account-icon">＋</div><b>Nạp thêm</b></div>
+      <div class="account-row disabled">
+        <div class="account-icon">⏳</div><b>Ví Trả Sau</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-item"><div class="nav-icon">🌐</div>QR Quốc tế</div>
+    <div class="nav-item active"><div class="nav-icon">▦</div>QR Thanh toán</div>
+    <div class="nav-item"><div class="nav-icon">🔳</div>Quét mã QR</div>
+    <div class="nav-item"><div class="nav-icon">💲</div>QR nhận tiền</div>
+  </div>
+
+</div>
+
+<script>
+
+/* ===== XU TOGGLE ===== */
+let xuEnabled = true; // MẶC ĐỊNH ON
+
+const xuSwitch = document.getElementById("xuSwitch");
+const xuToggle = document.getElementById("xuToggle");
+
+function renderXuState() {
+  xuSwitch.classList.toggle("on", xuEnabled);
+  xuToggle.classList.toggle("on", xuEnabled);
+  xuToggle.classList.toggle("off", !xuEnabled);
+
+  console.log("Xu toggle:", xuEnabled ? "ON" : "OFF");
+}
+
+xuSwitch.addEventListener("click", () => {
+  xuEnabled = !xuEnabled;
+  renderXuState();
+});
+
+// init
+renderXuState();
+
+/* ===== SHEET CONTROL ===== */
+function openSheet() {
+  document.getElementById("overlay").classList.add("show");
+  document.getElementById("sheet").classList.add("show");
+}
+function closeSheet() {
+  document.getElementById("overlay").classList.remove("show");
+  document.getElementById("sheet").classList.remove("show");
+}
+/* ===== QR COUNTDOWN + MANUAL REFRESH ===== */
+let t = 60;
+const cd = document.getElementById("cd");
+const qr = document.getElementById("qrImg");
+const refreshBtn = document.getElementById("manualRefresh");
+const qrBox = document.querySelector(".qr-box");
+
+function refreshQR(source = "auto") {
+  // 1. Refresh QR data
+  qr.src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MoMo-" +
+    Date.now();
+
+  // 2. Reward palette
+  const rewardMap = [
+    { color: "#FEC8DC", xu: "x1", textColor: "#A50064" },
+    { color: "#F3F8D9", xu: "x0.5",textColor: "#396F0F" },
+    { color: "#E5F9F2", xu: "x2" ,textColor: "#007F6F"},
+    { color: "#D2C0FF", xu: "x10",textColor: "#4E189A"}
+  ];
+
+  const reward =
+    rewardMap[Math.floor(Math.random() * rewardMap.length)];
+
+  // 3. Apply QR overlay color
+  document.getElementById("qrColor").style.background = reward.color;
+
+  // 4. Update xu banner text + background
+  const xuBanner = document.getElementById("xuBanner");
+  xuBanner.style.background = reward.color;
+  xuBanner.innerHTML =
+    `Thanh toán, <b style="color:${reward.textColor}">Tích ${reward.xu} XU</b> cho mọi giao dịch`;
+  
+  
+  // 5. Reset countdown & CTA
+  t = 60;
+  refreshBtn.classList.add("hidden");
+
+  console.log(
+    "QR refreshed:",
+    source,
+    "reward:",
+    reward.xu,
+    "color:",
+    reward.color
+  );
+}
+
+
+// manual click
+refreshBtn.addEventListener("click", () => {
+  refreshQR("manual");
+});
+
+setInterval(() => {
+  t--;
+  cd.textContent = t + "s";
+
+  // show manual refresh when <= 6s
+  if (t <= 58) {
+    refreshBtn.classList.remove("hidden");
+  }
+
+  if (t <= 0) {
+    refreshQR("auto");
+  }
+}, 1000);
+/* ===== VOUCHER TOGGLE LOGIC ===== */
+let voucherEnabled = true; // MẶC ĐỊNH ON
+
+const voucher = document.getElementById("voucherToggle");
+const voucherText = voucher.querySelector(".voucher-text");
+
+function renderVoucher() {
+  voucher.classList.toggle("on", voucherEnabled);
+  voucher.classList.toggle("off", !voucherEnabled);
+
+  voucherText.textContent = voucherEnabled
+    ? "Tự động áp dụng ưu đãi ✅"
+    : "Đang chưa áp dụng ưu đãi ✖️";
+
+  console.log("Voucher auto apply:", voucherEnabled ? "ON" : "OFF");
+}
+
+// click handler
+voucher.addEventListener("click", () => {
+  voucherEnabled = !voucherEnabled;
+  renderVoucher();
+});
+
+// init
+renderVoucher();
+
+</script>
+</body>
+</html>
