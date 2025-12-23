@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head >
-<script src="https://t.contentsquare.net/uxa/b6d17761cc37f.js"></script> 
+<head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=375, initial-scale=1.0" />
 <title>QR Thanh toán – Prototype</title>
@@ -465,15 +464,6 @@ body {
 </div>
 
 <script>
-  /* =====================================================
-   SCREEN VIEW
-   ===================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  track("qr_screen_view", {
-    screen: "qr_payment",
-    entry_point: "bottom_nav"
-  });
-});
 
 /* ===== XU TOGGLE ===== */
 let xuEnabled = true; // MẶC ĐỊNH ON
@@ -490,16 +480,7 @@ function renderXuState() {
 }
 
 xuSwitch.addEventListener("click", () => {
-  const prev = xuEnabled;
   xuEnabled = !xuEnabled;
-
-  track("toggle_xu", {
-    enabled: xuEnabled
-  });
-
-  if (prev && !xuEnabled) {
-    track("toggle_xu_off_after_on");
-  }
   renderXuState();
 });
 
@@ -546,27 +527,26 @@ function refreshQR(source = "auto") {
   const xuBanner = document.getElementById("xuBanner");
   xuBanner.style.background = reward.color;
   xuBanner.innerHTML =
-    `Thanh toán, <b style="color:${reward.textColor}">Tích ${reward.xu} XU :b </b> cho mọi giao dịch`;
+    `Thanh toán, <b style="color:${reward.textColor}">Tích ${reward.xu} XU</b> cho mọi giao dịch`;
+  
   
   // 5. Reset countdown & CTA
   t = 60;
   refreshBtn.classList.add("hidden");
-  
-  track(
-    source === "manual" ? "qr_refresh_manual" : "qr_refresh_auto",
-    { source }
-  );
 
-  track("qr_reward_roll", {
-    multiplier: reward.xu,
-    color: reward.color
-  });
+  console.log(
+    "QR refreshed:",
+    source,
+    "reward:",
+    reward.xu,
+    "color:",
+    reward.color
+  );
 }
 
 
 // manual click
 refreshBtn.addEventListener("click", () => {
-  track("qr_refresh_manual", { trigger: "cta_click" });
   refreshQR("manual");
 });
 
@@ -597,19 +577,12 @@ function renderVoucher() {
     ? "Tự động áp dụng ưu đãi ✅"
     : "Đang chưa áp dụng ưu đãi ✖️";
 
+  console.log("Voucher auto apply:", voucherEnabled ? "ON" : "OFF");
 }
 
 // click handler
 voucher.addEventListener("click", () => {
   voucherEnabled = !voucherEnabled;
-  track("toggle_auto_voucher", {
-    enabled: voucherEnabled
-  });
-  if (!voucherEnabled) {
-    track("voucher_off_before_pay", {
-      screen: "qr_payment"
-    });
-  }
   renderVoucher();
 });
 
@@ -619,7 +592,3 @@ renderVoucher();
 </script>
 </body>
 </html>
-
-
-
-
