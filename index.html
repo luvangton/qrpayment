@@ -358,6 +358,56 @@ body {
 }
 .nav-item.active { color: #ff4fa3; font-weight: 600; }
 .nav-icon { font-size: 28px; margin-bottom: 6px; }
+  /* ===== COMING SOON POPUP ===== */
+.coming-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.coming-overlay.show {
+  display: flex;
+}
+
+.coming-popup {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  width: 260px;
+  text-align: center;
+}
+
+.coming-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.coming-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.coming-btn {
+  background: #ff4fa3;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 0;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.coming-btn:active {
+  opacity: 0.8;
+}
+
 </style>
 </head>
 
@@ -589,8 +639,33 @@ voucher.addEventListener("click", () => {
 
 // init
 renderVoucher();
+function showComing() {
+  document.getElementById("comingOverlay").classList.add("show");
+}
+
+function closeComing() {
+  document.getElementById("comingOverlay").classList.remove("show");
+}
+
+// click ra ngoài popup để đóng
+document.getElementById("comingOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "comingOverlay") {
+    closeComing();
+  }
+});
 
 </script>
+  <div class="coming-overlay" id="comingOverlay">
+  <div class="coming-popup">
+    <div class="coming-title">🚧 Coming soon</div>
+    <div class="coming-desc">
+      Tính năng này đang được phát triển.<br />
+      Vui lòng quay lại sau.
+    </div>
+    <button class="coming-btn" onclick="closeComing()">OK</button>
+  </div>
+</div>
 </body>
 </html>
+
 
