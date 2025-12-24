@@ -142,52 +142,95 @@ body {
 
 .countdown {
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   color: #888;
-  margin: 8px 0 12px;
+  margin: 10px 10px 0px 10px;
 }
 /* ===== VOUCHER TOGGLE ===== */
+/* ===== VOUCHER BASE ===== */
 .voucher {
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 9px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: 16px;
   cursor: pointer;
-  transition: background .2s ease, color .2s ease;
+  margin: 12px 0;
 }
 
-/* ON */
-.voucher.on {
-  background: #eaf4ff;
+.voucher-left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-.voucher.on .voucher-text,
-.voucher.on .voucher-arrow {
-  color: #007aff;
+.voucher-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.voucher-title {
+  font-size: 12px;
   font-weight: 600;
 }
 
-/* OFF */
-.voucher.off {
-  background: #f1f1f1;
+.voucher-desc {
+  font-size: 10px;
+  margin-top: 2px;
 }
-.voucher.off .voucher-text,
-.voucher.off .voucher-arrow {
-  color: #999;
-  font-weight: 500;
+
+.voucher-action {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
 }
-/* NO VOUHCER */
-.voucher.no-voucher {
-  background: #F3F8D9;
-  cursor: default;
+
+/* ===== STATE 1: AUTO APPLY ON ===== */
+.voucher.state-auto-on {
+  background: #eef6ff;
 }
-.voucher.no-voucher .voucher-text,
-.voucher.no-voucher .voucher-arrow {
-  color: #5EA12A;
-  font-weight: 500;
+
+.voucher.state-auto-on .voucher-title {
+  color: #1a73e8;
 }
+
+.voucher.state-auto-on .voucher-action {
+  color: #ff4fa3;
+}
+
+/* ===== STATE 2: APPLYING ===== */
+.voucher.state-applying {
+  background: #f1fbf4;
+}
+
+.voucher.state-applying .voucher-title {
+  color: #1fa750;
+}
+
+.voucher.state-applying .voucher-action {
+  color: #ff4fa3;
+}
+
+/* ===== STATE 3: AUTO OFF ===== */
+.voucher.state-auto-off {
+  background: #f6f7f8;
+}
+
+.voucher.state-auto-off .voucher-title {
+  color: #333;
+}
+
+.voucher.state-auto-off .voucher-desc {
+  color: #888;
+}
+
+.voucher.state-auto-off .voucher-action {
+  color: #ff4fa3;
+}
+
 
 /* Text state cho xu-toggle */
 .xu-toggle {
@@ -196,7 +239,7 @@ body {
   justify-content: space-between;
   gap: 12px;
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .xu-toggle.off {
@@ -452,9 +495,21 @@ body {
       Mã QR thanh toán sẽ làm mới sau <b id="cd">60s</b>.
       <span id="manualRefresh" class="refresh hidden">Cập nhật</span>
     </div>
-    <div class="voucher on" id="voucherToggle">
-  <span class="voucher-text">Tự động áp dụng ưu đãi ✅</span>
+    <div class="voucher" id="voucher">
+  <div class="voucher-left">
+    <img
+  class="voucher-icon"
+  src="https://cdn-icons-png.flaticon.com/512/5738/5738102.png"
+  alt="Voucher icon"
+/>
+    <div class="voucher-content">
+      <div class="voucher-title"></div>
+      <div class="voucher-desc"></div>
+    </div>
+  </div>
+  <div class="voucher-action"></div>
 </div>
+
 <div class="xu-toggle on" id="xuToggle">
   <div>
     <b>Tự động đổi <span style="color:#FA8C16;font-style: italic;font-family: inherit;font-size: 16px;" >Xu</span> phù hợp</b><br>
@@ -634,46 +689,63 @@ setInterval(() => {
     refreshQR("auto");
   }
 }, 1000);
-/* ===== VOUCHER TOGGLE LOGIC ===== */
-const VOUCHER_STATE = [
+
+// VOUHCER TIME
+
+const VOUCHER_STATES = [
   "auto_on",
-  "auto_off",
-  "no_voucher"
+  "applying",
+  "auto_off"
 ];
 
-let voucherStateIndex = 0; 
-// 0 = AUTO_ON (mặc định)
-
-const voucher = document.getElementById("voucherToggle");
-const voucherText = voucher.querySelector(".voucher-text");
+let voucherIndex = 0;
 
 function renderVoucher() {
-  const voucher = document.getElementById("voucherToggle");
-  const text = voucher.querySelector(".voucher-text");
+  const voucher = document.getElementById("voucher");
+  const title = voucher.querySelector(".voucher-title");
+  const desc = voucher.querySelector(".voucher-desc");
+  const action = voucher.querySelector(".voucher-action");
 
   voucher.className = "voucher";
 
-  const state = VOUCHER_STATE[voucherStateIndex];
+  const state = VOUCHER_STATES[voucherIndex];
 
   if (state === "auto_on") {
-    voucher.classList.add("on");
-    text.textContent = "Tự động áp dụng ưu đãi ✅";
+    voucher.classList.add("state-auto-on");
+    title.textContent = "Tự động áp dụng ưu đãi phù hợp";
+    desc.textContent = "";
+    action.textContent = "Ưu đãi khác >";
+  }
+
+  if (state === "applying") {
+    voucher.classList.add("state-applying");
+    title.textContent = "Đang chọn (1) ưu đãi";
+    desc.textContent = "";
+    action.textContent = "Ưu đãi khác >";
   }
 
   if (state === "auto_off") {
-    voucher.classList.add("off");
-    text.textContent = "Đang chưa áp dụng ưu đãi ✖️";
+    voucher.classList.add("state-auto-off");
+    title.textContent = "Chưa bật áp dụng ưu đãi tự động";
+    desc.textContent =
+      "Bật để tối ưu chi tiêu hoặc tự chọn ưu đãi";
+    action.textContent = "Xem thêm >";
   }
 
-  if (state === "no_voucher") {
-    voucher.classList.add("no-voucher");
-    text.textContent = "Bạn đang chọn (1) voucher 🎁";
-  }
-
-  track("toggle_auto_voucher", {
-    state
-  });
+  // tracking (nếu có)
+  track?.("voucher_state_change", { state });
 }
+
+document
+  .getElementById("voucher")
+  .addEventListener("click", () => {
+    voucherIndex =
+      (voucherIndex + 1) % VOUCHER_STATES.length;
+    renderVoucher();
+  });
+
+renderVoucher();
+
 
 
 // click handler
