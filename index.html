@@ -20,7 +20,7 @@ body {
 /* ===== APP FRAME ===== */
 .app {
   width: 375px;
-  height: 812px;
+  height: 780px;
   background: linear-gradient(180deg,#b0005a,#d81b7d);
   border-radius: 24px;
   position: relative;
@@ -153,7 +153,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   transition: background .2s ease, color .2s ease;
 }
@@ -173,13 +173,21 @@ body {
 .voucher.off {
   background: #f1f1f1;
 }
-
 .voucher.off .voucher-text,
 .voucher.off .voucher-arrow {
   color: #999;
   font-weight: 500;
 }
-
+/* NO VOUHCER */
+.voucher.no-voucher {
+  background: #F3F8D9;
+  cursor: default;
+}
+.voucher.no-voucher .voucher-text,
+.voucher.no-voucher .voucher-arrow {
+  color: #5EA12A;
+  font-weight: 500;
+}
 
 /* Text state cho xu-toggle */
 .xu-toggle {
@@ -590,7 +598,7 @@ function refreshQR(source = "auto") {
   const xuBanner = document.getElementById("xuBanner");
   xuBanner.style.background = reward.color;
   xuBanner.innerHTML =
-    `Thanh toán, <b style="color:${reward.textColor}">Tích ${reward.xu} XU</b> cho mọi giao dịch`;
+    `<b style="color:${reward.textColor}">CHÚC MỪNG</b>, thanh toán nhận liền <b style="color:${reward.textColor}"> ${reward.xu} XU</b>`;
   
   
   // 5. Reset countdown & CTA
@@ -627,30 +635,61 @@ setInterval(() => {
   }
 }, 1000);
 /* ===== VOUCHER TOGGLE LOGIC ===== */
-let voucherEnabled = true; // MẶC ĐỊNH ON
+const VOUCHER_STATE = [
+  "auto_on",
+  "auto_off",
+  "no_voucher"
+];
+
+let voucherStateIndex = 0; 
+// 0 = AUTO_ON (mặc định)
 
 const voucher = document.getElementById("voucherToggle");
 const voucherText = voucher.querySelector(".voucher-text");
 
 function renderVoucher() {
-  voucher.classList.toggle("on", voucherEnabled);
-  voucher.classList.toggle("off", !voucherEnabled);
+  const voucher = document.getElementById("voucherToggle");
+  const text = voucher.querySelector(".voucher-text");
 
-  voucherText.textContent = voucherEnabled
-    ? "Tự động áp dụng ưu đãi ✅"
-    : "Đang chưa áp dụng ưu đãi ✖️";
+  voucher.className = "voucher";
 
-  console.log("Voucher auto apply:", voucherEnabled ? "ON" : "OFF");
+  const state = VOUCHER_STATE[voucherStateIndex];
+
+  if (state === "auto_on") {
+    voucher.classList.add("on");
+    text.textContent = "Tự động áp dụng ưu đãi ✅";
+  }
+
+  if (state === "auto_off") {
+    voucher.classList.add("off");
+    text.textContent = "Đang chưa áp dụng ưu đãi ✖️";
+  }
+
+  if (state === "no_voucher") {
+    voucher.classList.add("no-voucher");
+    text.textContent = "Bạn đang chọn (1) voucher 🎁";
+  }
+
+  track("toggle_auto_voucher", {
+    state
+  });
 }
 
+
 // click handler
-voucher.addEventListener("click", () => {
-  voucherEnabled = !voucherEnabled;
-  renderVoucher();
-});
+document
+  .getElementById("voucherToggle")
+  .addEventListener("click", () => {
+    voucherStateIndex =
+      (voucherStateIndex + 1) % VOUCHER_STATE.length;
+
+    renderVoucher();
+  });
+  
+// ví dụ khi load QR
+renderVoucher();
 
 // init
-renderVoucher();
 function showComing() {
   document.getElementById("comingOverlay").classList.add("show");
 }
