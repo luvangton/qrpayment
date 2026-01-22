@@ -1,140 +1,174 @@
-<!DOCTYPE html>
+<!-- index.html -->
+<!doctype html>
 <html lang="vi">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=375, initial-scale=1.0" />
-<title>QR Thanh toán – Prototype</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>QR Thanh toán</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
 
-<link rel="stylesheet" href="styles.css" />
-</head>
-
-<body>
-<div class="app">
-
-  <!-- HEADER -->
-<div class="header">
-  <div class="header-left">
-    <div class="icon-btn">←</div>
-    <span class="header-title">QR của tôi</span>
-  </div>
-
-  <div class="header-right">
-    <div class="icon-btn">▦</div>
-    <div class="icon-btn">🛒</div>
-    <div class="icon-btn">✕</div>
-  </div>
-</div>
-
-
-  <!-- MAIN CARD -->
-  <div class="card">
-    <div class="xu-banner"id="xuBanner">🌼 Thanh toán, <b style="color:#007AFF;font-style: italic;font-family: inherit;font-size: 16px;">tích xu</b> cho tất cả giao dịch</div>
-    <div class="barcode"></div>
-    <div class="qr-wrapper">
-     <div class="qr-box">
-  <img id="qrImg"
-    src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=MoMoDemo" />
-  <div class="qr-color-layer" id="qrColor"></div>
-</div>
-    </div>
-    <div class="countdown">
-      Mã QR thanh toán sẽ làm mới sau <b id="cd">60s</b>.
-      <span id="manualRefresh" class="refresh hidden">Cập nhật</span>
-    </div>
-    <div class="voucher" id="voucher">
-  <div class="voucher-left">
-    <img
-  class="voucher-icon"
-  src="https://cdn-icons-png.flaticon.com/512/5738/5738102.png"
-  alt="Voucher icon"
-/>
-    <div class="voucher-content">
-      <div class="voucher-title"></div>
-      <div class="voucher-desc"></div>
-    </div>
-  </div>
-  <div class="voucher-action"></div>
-</div>
-
-<div class="xu-toggle on" id="xuToggle">
-  <div>
-    <b>Tự động đổi <span style="color:#FA8C16;font-style: italic;font-family: inherit;font-size: 16px;" >Xu</span> phù hợp</b><br>
-    <small>Giảm tới 50% đơn hàng</small>
-  </div>
-  <div class="switch on" id="xuSwitch"></div>
-</div>
-  </div>
-
-  <!-- ACCOUNT PREVIEW -->
-  <div class="account-section">
-    <div class="account-header">
-      <span>Tài khoản/Thẻ</span>
-      <span onclick="openSheet()">Xem tất cả</span>
-    </div>
-    <div class="account-list">
-      <div class="account-card active">Vietcombank<br><small  class="card-info">10k – 2tr/GD</small></div>
-      <div class="account-card">Ví MoMo<br><small class="card-info">1.304.072đ</small></div>
-      <div class="account-card">🎁 Túi Thần Tài<br><small class="card-info">300.083đ</small></div>
-      <div class="account-card">ACB<br><small class="card-info">10k – 10tr/GD</small></div>
-    </div>
-  </div>
-
-  <!-- OVERLAY -->
-  <div class="overlay" id="overlay" onclick="closeSheet()"></div>
-
-  <!-- BOTTOM SHEET -->
-  <div class="sheet" id="sheet">
-    <div class="sheet-header">
-      <span></span>Chọn tài khoản<span onclick="closeSheet()">✕</span>
-    </div>
-    <div class="sheet-body">
-      <div class="account-row active">
-        <div class="account-icon">MoMo</div>
-        <div class="account-info"><b>Ví MoMo</b><br><small>Miễn phí thanh toán</small></div>
-        <b>1.304.072đ</b>
+  <body>
+    <div class="app">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="left">
+          <div class="back">←</div>
+          <div class="title">QR của tôi</div>
+        </div>
+        <div class="right">
+          <div class="icon-btn">▦</div>
+          <div class="icon-btn">🛒</div>
+          <div class="icon-btn">✕</div>
+        </div>
       </div>
-      <div class="account-row">
-        <div class="account-icon">🎁</div>
-        <div class="account-info"><b>Túi Thần Tài</b></div>
-        <b>300.083đ</b>
+
+      <!-- PROMO BANNER (image src is set by JS) -->
+      <div class="promo-frame">
+        <img id="promoImg" alt="Promo banner" src="https://freedesignfile.com/upload/2022/11/Promotion-banner-advertising-hot-sale-discount-vector.jpg" />
       </div>
-      <div class="account-row">
-        <div class="account-icon">ACB</div>
-        <div class="account-info"><b>ACB</b></div>
+
+      <!-- MAIN CARD -->
+      <div class="card">
+        <div class="xu-banner" id="xuBanner">
+          🌼 Thanh toán,
+          <b
+            style="
+              color: #007aff;
+              font-style: italic;
+              font-family: inherit;
+              font-size: 16px;
+            "
+            >tích xu</b
+          >
+          cho tất cả giao dịch
+        </div>
+
+        <div class="barcode"></div>
+
+        <!-- QR: smaller + left, with right-side area reserved -->
+        <div class="qr-wrapper">
+          <div class="qr-box">
+            <img
+              id="qrImg"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=MoMoDemo"
+              alt="QR thanh toán"
+            />
+            <div class="qr-color-layer" id="qrColor"></div>
+          </div>
+
+          <div class="qr-right">
+            <div class="countdown">
+              Mã QR thanh toán sẽ làm mới sau <b id="cd">60s</b>.
+              <span id="manualRefresh" class="refresh hidden">Cập nhật</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="voucher" id="voucher">
+          <div class="voucher-left">
+            <img
+              class="voucher-icon"
+              src="https://cdn-icons-png.flaticon.com/512/1041/1041885.png"
+            />
+            <div class="voucher-text">
+              <div class="voucher-title" id="voucherTitle">
+                Voucher: Chọn ưu đãi phù hợp
+              </div>
+              <div class="voucher-sub" id="voucherSub">
+                Tự động áp dụng ưu đãi phù hợp
+              </div>
+            </div>
+          </div>
+          <div class="chev">›</div>
+        </div>
+
+        <div class="auto-xu">
+          <div>
+            <div class="auto-title">Tự động đổi Xu phù hợp</div>
+            <div class="auto-sub">
+              Khi bật, Xu tự động được sử dụng khi đủ điều kiện
+            </div>
+          </div>
+          <div id="xuToggle" class="toggle on">
+            <div id="xuSwitch" class="switch on"></div>
+          </div>
+        </div>
       </div>
-      <div class="account-row">
-        <div class="account-icon">VCB</div>
-        <div class="account-info"><b>Vietcombank</b></div>
+
+      <!-- ACCOUNT CARD PICKER -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Chọn tài khoản / thẻ</div>
+          <div id="openSheet" class="section-link">Xem tất cả</div>
+        </div>
+
+        <div class="cards">
+          <div class="card-item active">
+            <div class="card-name">Ví MoMo</div>
+            <div class="card-sub">Số dư: 1.250.000đ</div>
+          </div>
+
+          <div class="card-item">
+            <div class="card-name">ATM •••• 1234</div>
+            <div class="card-sub">Ngân hàng ACB</div>
+          </div>
+
+          <div class="card-item">
+            <div class="card-name">Visa •••• 8888</div>
+            <div class="card-sub">Ngân hàng VCB</div>
+          </div>
+        </div>
       </div>
-      <div class="account-row"><div class="account-icon">＋</div><b>Nạp thêm</b></div>
-      <div class="account-row disabled">
-        <div class="account-icon">⏳</div><b>Ví Trả Sau</b>
+
+      <!-- BOTTOM NAV -->
+      <div class="bottom-nav">
+        <div class="nav-item">
+          <div class="nav-ic">🏠</div>
+          <div class="nav-txt">Trang chủ</div>
+          <div class="tag">Coming soon</div>
+        </div>
+
+        <div class="nav-item active">
+          <div class="nav-ic">⌁</div>
+          <div class="nav-txt">QR Thanh toán</div>
+        </div>
+
+        <div class="nav-item">
+          <div class="nav-ic">👤</div>
+          <div class="nav-txt">Tài khoản</div>
+          <div class="tag">Coming soon</div>
+        </div>
+
+        <div class="nav-item">
+          <div class="nav-ic">⋯</div>
+          <div class="nav-txt">Khác</div>
+          <div class="tag">Coming soon</div>
+        </div>
+      </div>
+
+      <!-- COMING SOON MODAL -->
+      <div id="comingOverlay" class="coming-overlay hidden"></div>
+      <div id="comingModal" class="coming-modal hidden">
+        <div class="coming-title">Coming soon</div>
+        <div class="coming-sub">Tính năng này đang được phát triển.</div>
+        <button id="closeComing" class="coming-btn">Đóng</button>
+      </div>
+
+      <!-- SHEET -->
+      <div id="sheetOverlay" class="sheet-overlay hidden"></div>
+      <div id="sheet" class="sheet hidden">
+        <div class="sheet-head">
+          <div class="sheet-title">Tất cả tài khoản / thẻ</div>
+          <div id="closeSheet" class="sheet-close">✕</div>
+        </div>
+
+        <div class="sheet-item">Ví MoMo • Số dư 1.250.000đ</div>
+        <div class="sheet-item">ATM •••• 1234 • ACB</div>
+        <div class="sheet-item">Visa •••• 8888 • VCB</div>
       </div>
     </div>
-  </div>
 
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <div class="nav-item" onclick="showComing()"><div class="nav-icon">🌐</div>QR Quốc tế</div>
-    <div class="nav-item active"><div class="nav-icon">▦</div>QR Thanh toán</div>
-    <div class="nav-item" onclick="showComing()"><div class="nav-icon">🔳</div>Quét mã QR</div>
-    <div class="nav-item" onclick="showComing()"><div class="nav-icon">💲</div>QR nhận tiền</div>
-  </div>
-  
-<!-- Coming Soon Popup -->
-<div class="coming-overlay" id="comingOverlay">
-  <div class="coming-popup">
-    <div class="coming-title">🚧 Coming soon</div>
-    <div class="coming-desc">
-      Tính năng này đang được phát triển.<br />
-      Vui lòng quay lại sau.
-    </div>
-    <button class="coming-btn" onclick="closeComing()">OK</button>
-  </div>
-</div>
-
-</div>
-
-<script src="script.js"></script>
-</body>
+    <script src="./script.js"></script>
+  </body>
 </html>
