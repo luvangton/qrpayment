@@ -429,7 +429,6 @@ body {
 .entrypoint {
   margin: 0 4px;
   background: linear-gradient(135deg, #FFF0F7 0%, #FFF6F3 100%);
-  border: 1.5px solid #F382C0;
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
