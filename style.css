@@ -101,7 +101,7 @@ body {
   background: #FFF9E5;
   border-bottom: 2px solid #fff;
   border-radius: 0 0 16px 16px;
-  padding: 10px 8px 10px 12px;
+  padding: 5px 10px 5px 10px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -117,11 +117,11 @@ body {
 }
 .banner-text {
   flex: 1;
-  font-size: 14px; font-weight: 600;
+  font-size: 16px; font-weight: 600;
   color: #303233;
   line-height: 20px;
 }
-.banner-text .xu { color: #FA6532; font-family: sans-serif; font-size: 12px; }
+.banner-text .xu { color: #FA6532; font-family: sans-serif; font-size: 16px; }
 .banner-chevron {
   width: 16px; height: 16px;
   background: rgba(255,255,255,0.6);
@@ -440,7 +440,7 @@ body {
 }
 .entrypoint:active { opacity: 0.85; transform: scale(0.99); }
 .entry-icon {
-  width: 28px; height: 28px;
+  width: 35px; height: 35px;
   flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
 }
@@ -454,7 +454,7 @@ body {
 .entry-btn {
   background: linear-gradient(135deg, #EB2F96, #A60064);
   border-radius: 10px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   font-size: 13px; font-weight: 700;
   color: #fff;
   white-space: nowrap;
